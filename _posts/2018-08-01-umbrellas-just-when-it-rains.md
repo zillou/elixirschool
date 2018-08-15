@@ -23,21 +23,19 @@ In Elixir a Library would lack the `:mod` key in the Mix `application/0` functio
 
 Applications are like Libraries but contain a supervision tree.
 If you open the `mix.exs` file for a project and see that the `application/0` function defines a `:mod` entry point: you're working with an Application.
-This is a dependency that has and maintains state and additional processes.
-These aren't simply modules with simple functions.
+This is a dependency that has, and maintains, state in addition to processes.
+An Application isn't simply a module with simple functions.
 
 Lastly we have Umbrellas applications which are little more than syntactic sugar for managing a collection of Libraries and Applications as a single project.
 Why we might use Umbrellas is what we'll explore here today.
 
 ## Getting to know Umbrella Applications
 
-...
-
-If you haven't already, take a peek at the [Umbrella]() lesson which provides a great overview of Umbrella applications.
+If you haven't already, take a peek at the [Umbrella](/en/lessons/advanced/umbrella-projects/) lesson which provides a great overview of Umbrella applications.
 
 ## Separating concerns
 
-In my humble opinion one of the great strengths to Umbrellas is the forced separation of concerns and decoupling of code.
+In my humble opinion one of the great strengths of Umbrellas is the forced separation of concerns and decoupling of code.
 We have to be explicit with our individual application's configuration and this includes dependencies on other peer applications.
 If our presentation layer doesn't have the internal data application as a dependency there's no chance those two components will become coupled.
 
@@ -48,12 +46,12 @@ Above any other reason, this is often the deciding factor for whether or not I l
 
 ## Service Oriented Architect lite
 
-If we know we building a complex application who's internal components will grow in size with distinct roles and responsibilities, Umbrellas can be a valuable tool in the toolchest.
+If we know we are building a complex application with internal components that will grow in size with distinct roles and responsibilities, Umbrellas can be a valuable tool in the toolchest.
 
 With one codebase and repository we're able to maintain any number of sub applications as part of our overall Umbrella.
 If we're building an online marketplace we could use this to keep our payment transaction code isolated from our other modules.
 We can implement integrations with third-party services as standalone applications inside our Umbrella.
-This not only keeps those concerns separated but allows us to work on components individual and more importantly: test them individually.
+This not only keeps those concerns separated but allows us to work on components individually and more importantly: test them individually.
 
 Nothing is keeping us from running multiple Phoenix applications in a single Umbrella.
 We can develop our admin web portal independently of our customer facing site, running on a separate port making it a matter of network configuration to limit access to VPN users only.
@@ -76,11 +74,11 @@ Contrary to what some may believe, Umbrella applications aren't a perfect soluti
 Before we `mix new` we should pause and consider some simple rules to help guide our decision making process:
 
 - Is this a simple Application or is it likely to grow in scope and size quickly?
-- Are there multiple  distinct and separate internal components to our application?
+- Are there multiple distinct and separate internal components to our application?
 - Will multiple people be working on different parts of the code at once?
 
 If we've answered YES to the above then an Umbrella might be the right choice for your project.
 
 We'd love to hear your thoughts!
-Are you using Umbrellas applications?
+Are you using Umbrella applications?
 Have you found them helpful or a hinderance?
