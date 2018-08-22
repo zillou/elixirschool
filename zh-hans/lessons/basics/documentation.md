@@ -1,17 +1,17 @@
 ---
 version: 1.0.2
-title: 文档模块
+title: 文档
 ---
 
-Documenting Elixir code.
+为 Elixir 代码编写文档。
 
 {% include toc.html %}
 
 ## 注解
 
-如何写注释以及如何编写高质量的文档，这两个问题在编程界依然存在很多争论。然而，在代码中加入适当的文档或者注释很重要，这点是没有什么争议的。
+要在代码中添加多少注释以及什么才是高质量的文档，这两个问题在编程界依然存在很多争论。然而，在代码中加入适当的文档或者注释很重要，这点是没有什么争议的。
 
-Elixir把文档看作是*一等公民*，它提供了大量的函数来为项目创建和操作（access）文档。Elixir提供了多种方式来编写注释或者是注解。下面是其中三种方式：
+Elixir 把文档看作是*一等公民*，它提供了大量的函数来为项目创建和操作（access）文档。Elixir 提供了多种方式来编写注释或者是注解。下面是其中三种方式：
 
   - `#` - 用于单行的注释
   - `@moduledoc` - 用于模块文档的注释
@@ -19,9 +19,9 @@ Elixir把文档看作是*一等公民*，它提供了大量的函数来为项目
 
 ### 单行注释
 
-最简单的注释代码的方式可能是使用单行注释了。与Ruby或Python类似，Elixir的单行注释标识符为`#`，也就是井号。
+最简单的注释代码的方式可能是使用单行注释了。与 Ruby 或 Python 类似，Elixir 的单行注释标识符为`#`，也就是井号。
 
-看下这个Elixir Script (greeting.exs)：
+看下这段 Elixir 代码 (greeting.exs)：
 
 ```elixir
 # Outputs 'Hello, chum.' to the console.
@@ -32,7 +32,7 @@ IO.puts("Hello, " <> "chum.")
 
 ### 模块注释
 
-`@moduledoc`提供模块级别的注释。这个注解一般放在模块定义的最前面，也就是`defmodule`后。下面的例子简单地展示了`@moduledoc`这个装饰器的用法。
+`@moduledoc` 提供模块级别的注释。这个注解一般放在模块定义的最前面，也就是 `defmodule` 后。下面的例子简单地展示了 `@moduledoc` 这个装饰器的用法。
 
 ```elixir
 defmodule Greeter do
@@ -46,7 +46,7 @@ defmodule Greeter do
 end
 ```
 
-用户可以在IEx里面通过`h`这个辅助函数看到我们在这个模块里定义的文档。
+用户可以在 IEx 里面通过`h`这个辅助函数看到我们在这个模块里定义的文档。
 
 ```elixir
 iex> c("greeter.ex")
@@ -175,19 +175,22 @@ Examples
     "Hello, pete"
 ```
 
-### 安装过程
+### 安装
 
 假设一切都正常工作，那么你将看到和上面一样的输出，现在我们将配置ExDoc。在文件`mix.exs`中，添加两个依赖`:earmark` 和 `:ex_doc`。
 
 ```elixir
 def deps do
-  [{:earmark, "~> 0.1", only: :dev}, {:ex_doc, "~> 0.11", only: :dev}]
+  [
+    {:earmark, "~> 1.2", only: :dev},
+    {:ex_doc, "~> 0.19", only: :dev}
+  ]
 end
 ```
 
 使用`only: :dev`是因为我们不想在生产环境下下载和编译这些依赖。为什么需要Earmark呢？Earmark是一个使用Elixir编写的markdown分析器，ExDoc使用它来将带有`@moduledoc` 和 `@doc`的注释转换成漂亮的HTML页面。
 
-你可以不使用Earmark。你可以将分析后端改为Pandoc、Hoedown或者Cmark；但是你得根据[这里的文档](https://github.com/elixir-lang/ex_doc#changing-the-markdown-tool)做一点配置工作。在这篇教程里面，我们将使用Earmark。
+你不一定要用Earmark，你也可以使用其他的标记语言引擎，如：Pandoc、Hoedown或者Cmark；但是你得根据[这里的文档](https://github.com/elixir-lang/ex_doc#changing-the-markdown-tool)做一点配置工作。在这篇教程里面，我们将使用Earmark。
 
 ### 生成文档
 
@@ -209,13 +212,13 @@ View them at "doc/index.html".
 
 ![ExDoc Screenshot 2]({% asset_path "documentation_2.png" %})
 
-我们可以将这个文档部署到github，也可以部署到Elixir的官方镜像 [HexDocs](https://hexdocs.pm/)。
+我们可以将这个文档部署到 GitHub，也可以部署到 Elixir 的官方镜像 [HexDocs](https://hexdocs.pm/)。
 
 ## 最佳实践
 
-编写文档是编程的最佳实践。因为Elixir还很年轻，许多语言标准依然在随着它的生态发展而发展。Elixir的社区正在尝试进行这种最佳实践。你可以从[Elixir代码风格](https://github.com/niftyn8/elixir_style_guide)中了解到类似的最佳实践。
+因为 Elixir 还很年轻，许多 Elixir 语言的标准依然在随着它的生态发展而发展。Elixir 社区正在尝试总结出尽量多的最佳实践。你可以从[Elixir代码风格](https://github.com/niftyn8/elixir_style_guide)中了解到类似的最佳实践。
 
-  - 总是给模块提供注释
+  - 总是给模块编写文档
 
 ```elixir
 defmodule Greeter do
@@ -226,7 +229,7 @@ defmodule Greeter do
 end
 ```
 
-  - 如果你不想给模块注释，**不要留空**。可以考虑给模块注解提供一个值为`false`的参数，就像下面这样：
+  - 如果你不想给模块编写文档，**不要留空**。可以考虑给模块注解提供一个值为`false` 的参数，就像下面这样：
 
 ```elixir
 defmodule Greeter do
@@ -235,7 +238,7 @@ defmodule Greeter do
 end
 ```
 
- - 当在模块里面引用一个函数时，使用单引号将其括起来：
+ - 当在模块里面引用一个函数时，使用反引号（`\``）将其括起来：
 
 ```elixir
 defmodule Greeter do
@@ -270,7 +273,7 @@ defmodule Greeter do
 end
 ```
 
- - 使用markdown语法来编写文档。因为它能被ExDoc和IEx更好地解析：
+ - 使用 Markdown 语法来编写文档。因为它能被 ExDoc 和 IEx 更好地解析：
 
 ```elixir
 defmodule Greeter do
