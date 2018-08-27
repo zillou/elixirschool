@@ -1,28 +1,29 @@
 ---
 version: 1.0.0
-title: Mnesia
+title: Mnesia 数据库
 ---
 
-Mnesia is a heavy duty real-time distributed database management system.
+Mnesia 是一个强大的分布式实时数据库管理系统。
 
 {% include toc.html %}
 
-## Overview
+## 概要
 
-Mnesia is a Database Management System (DBMS) that ships with the Erlang Runtime System which we can use naturally with Elixir. The Mnesia *relational and object hybrid data model* is what makes it suitable for developing distributed applications of any scale.
+Mnesia 是 Erlang 运行时中自带的一个数据库管理系统（DBMS），也可以在 Elixir 中很自然地使用。Mnesia 的数据库模型可以混合了关系型和对象型数据模型的特征，让它可以用来开发任何规模的分布式应用程序。
 
-## When to use
+## 应用场景
 
+何时该使用何种技术常常是一个令人困惑的事情。如果下面这些问题中任意一个的答案是 yes 的话，则是一个很好的迹象告诉我们在这个情况下用 Mnesia 比用 ETS 或者 DETS 要适合。
 When to use a particular piece of technology is often a confusing pursuit. If you can answer 'yes' to any of the following questions, then this is a good indication to use Mnesia over ETS or DETS.
 
-  - Do I need to roll back transactions?
-  - Do I need an easy to use syntax for reading and writing data?
-  - Should I store data across multiple nodes, rather than one?
-  - Do I need a choice where to store information (RAM or disk)?
+  - 我是否需要回滚事务？
+  - 我是否需要用一个简单的语法来读写数据？
+  - 我是否需要在多于一个以上的节点存储数据？
+  - 我是否需要选择数据存储的位置（内存还是硬盘）？
 
 ## Schema
 
-As Mnesia is part of the Erlang core, rather than Elixir, we have to access it with the colon syntax (See Lesson: [Erlang Interoperability](../../advanced/erlang/)):
+因为 Mnesia 是 Erlang 的内容，还没有被包含到 Elixir，我们要用 `:mnesia` 这种方式去引用 Mnesia （参考[和 Erlang 互操作](../../advanced/erlang/)）。
 
 ```elixir
 
@@ -34,11 +35,11 @@ iex> alias :mnesia, as: Mnesia
 iex> Mnesia.create_schema([node()])
 ```
 
-For this lesson, we will take the latter approach when working with the Mnesia API. `Mnesia.create_schema/1` initializes a new empty schema and passes in a Node List. In this case, we are passing in the node associated with our IEx session.
+在本课中，我们会使用后一种方式来使用 Mnesia 的 API。`Mnesia.create_schema/1` 会初始化一个空的 Schema 并且传递给一个节点列表。 在本例中，我们传入的是当前 IEx 会话所在的节点。
 
-## Nodes
+## 节点（Node）
 
-Once we run the `Mnesia.create_schema([node()])` command via IEx, you should see a folder called **Mnesia.nonode@nohost** or similar in your present working directory. You may be wondering what the **nonode@nohost** means as we haven't come across this before. Let's have a look.
+一旦我们在 IEx 中执行了 `Mnesia.create_schema([node()])` 命令后，我们就可以在当前目录下看到一个叫 **Mnesia.nonode@nohost** 或者类似名字的文件夹。你也许会好奇到底 **nonode@nohost** 代表着什么，因为我们还没有在之前的课程中见过它。我们接下来就来看看：
 
 ```shell
 $ iex --help
@@ -68,7 +69,8 @@ Usage: iex [options] [.exs file] [data]
 ** Options can be passed to the VM using ELIXIR_ERL_OPTIONS or --erl
 ```
 
-When we pass in the `--help` option to IEx from the command line we are presented with all the possible options. We can see that there is a `--name` and `--sname` options for assigning information to nodes. A node is just a running Erlang Virtual Machine which handles it's own communications, garbage collection, processing scheduling, memory and more. The node is being named as **nonode@nohost** simply by default.
+当你给 IEx 传递 `--help` 选项的时候，IEx 会列出所有可用的选项。我们可以看到有 `--name` 和 `--sname` 两个选项可以给节点起名。
+一个节点（Node）就是一个运行中的 Erlang 虚拟机，它独自管理着自己的通讯，垃圾回收，进程调度以及内存等等。如果你没有给节点起名，那么这个节点的名字就叫 **nonode@nohost** 。
 
 ```shell
 $ iex --name learner@elixirschool.com
@@ -80,7 +82,7 @@ iex(learner@elixirschool.com)> Node.self
 :"learner@elixirschool.com"
 ```
 
-As we can now see, the node we are running is an atom called `:"learner@elixirschool.com"`. If we run `Mnesia.create_schema([node()])` again, we will see that it created another folder called **Mnesia.learner@elixirschool.com**. The purpose of this is quite simple. Nodes in Erlang are used to connect to other nodes to share (distribute) information and resources. This doesn't have to be restricted to the same machine and can communicate via LAN, the internet etc.
+我们可以看到，当我给节点起名后，我们当前的节点名字已经叫做 `:"learner@elixirschool.com"`。如果我们再运行 `Mnesia.create_schema([node()])` 的话，我们会看到另外一个叫做 **Mnesia.learner@elixirschool.com** 的文件夹。这样设计的目的很简单。Erlang 中的节点只是用来连接其他节点用以分享（分发）信息和资源，它们并不一定要在同一台机器上，也可以通过局域网或者互联网等方式通讯。
 
 ## Starting Mnesia
 
@@ -117,9 +119,10 @@ iex> Mnesia.create_table(Person, [attributes: [:id, :name, :job]])
 {:aborted, {:already_exists, Person}}
 ```
 
-## The Dirty Way
+## 脏操作
 
 First of all we will look at the dirty way of reading and writing to a Mnesia table. This should generally be avoided as success is not guaranteed, but it should help us learn and become comfortable working with Mnesia. Let's add some entries to our **Person** table.
+首先我们来学习对 Mnesia 表的脏炒作方式。一般情况下，我们都不会使用脏操作，因为脏操作并不一定保证成功，但是它可以帮助我们学习和适应 Mnesia 的使用方式。下面让我们往 **Person** 表中添加一些记录。
 
 ```elixir
 iex> Mnesia.dirty_write({Person, 1, "Seymour Skinner", "Principal"})
@@ -132,7 +135,7 @@ iex> Mnesia.dirty_write({Person, 3, "Moe Szyslak", "Bartender"})
 :ok
 ```
 
-...and to retrieve the entries we can use `Mnesia.dirty_read/1`:
+...然后我们可以通过 `Mnesia.dirty_read/1` 来读取数据：
 
 ```elixir
 iex> Mnesia.dirty_read({Person, 1})
@@ -148,11 +151,11 @@ iex> Mnesia.dirty_read({Person, 4})
 []
 ```
 
-If we try to query a record that doesn't exist Mnesia will respond with an empty list.
+如果我们查询的记录不存在时，Mnesia 会返回一个空的列表。
 
-## Transactions
+## 事务（Transaction）
 
-Traditionally we use **transactions** to encapsulate our reads and writes to our database. Transactions are an important part of designing fault-tolerant, highly distributed systems. An Mnesia *transaction is a mechanism by which a series of database operations can be executed as one functional block*. First we create an anonymous function, in this case `data_to_write` and then pass it onto `Mnesia.transaction`.
+我们一般会把我们对数据库的读写包在一个数据库事务里面。对事务的支持对设计容错系统和分布式系统非常重要。Mnesia 的事务是通过对数据库的多个操作包含到一个函数体中来实现。首先我们创建一个匿名函数，如此例中的 `data_to_write`，然后把这个函数传给 `Mnesia.transaction`。
 
 ```elixir
 iex> data_to_write = fn ->
@@ -166,7 +169,8 @@ iex> data_to_write = fn ->
 iex> Mnesia.transaction(data_to_write)
 {:atomic, :ok}
 ```
-Based on this transaction message, we can safely assume that we have written the data to our `Person` table. Let's use a transaction to read from the database now to make sure. We will use `Mnesia.read/1` to read from the database, but again from within an anonymous function.
+
+从 IEx 中打印的消息看来，我们可以安全地假设数据已经被成功地写进了 `Person` 表。我们来验证一下使用事务从数据库里面读出刚刚写入的数据。我们可以用 `Mnesia.read/1` 来从数据库里面读取数据，同样的，我们也需要使用一个匿名函数。
 
 ```elixir
 iex> data_to_read = fn ->
@@ -188,8 +192,10 @@ iex> Mnesia.transaction(
 ...> )
 ```
 
-## Using indices
+## 使用索引
 
+Mnesia 支持在非主键字段上添加索引
+所以我们可以在 `Person` 表的 `:job`
 Mnesia support indices on non-key columns and data can then be queried against those indices. So we can add an index against the `:job` column of the `Person` table:
 
 ```elixir
